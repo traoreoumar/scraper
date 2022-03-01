@@ -1,4 +1,8 @@
+drivers/
 vendor/
 
 # PHP CS FIXER
 .php-cs-fixer.cache
+
+# PHPUNIT
+.phpunit.result.cache
