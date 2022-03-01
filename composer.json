@@ -1,0 +1,13 @@
+{
+    "name": "oumartraore/scraper",
+    "description": "A web scraping helper library for PHP",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/traoreoumar/scraper",
+    "authors": [
+        {
+            "name": "Oumar Traore",
+            "email": "oumar.traore.dev@gmail.com"
+        }
+    ]
+}
