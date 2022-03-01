@@ -1,0 +1,56 @@
+name: "Tests"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+
+env:
+  fail-fast: true
+
+jobs:
+  tests:
+    name: "PHP ${{ matrix.php-version }} - ${{ matrix.dependency-stability }} - ${{ matrix.operating-system }}"
+    runs-on: ${{ matrix.operating-system }}
+    continue-on-error: false
+    strategy:
+      matrix:
+        operating-system: [ ubuntu-latest ]
+        php-version: [ '8.0', '8.1' ]
+        dependency-stability: [ 'prefer-stable' ]
+        include:
+          - operating-system: ubuntu-latest
+            php-version: '8.0.2'
+            dependency-stability: 'prefer-lowest'
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v2.3.3
+
+      - name: 'Install PHP with extensions'
+        uses: shivammathur/setup-php@v2
+        with:
+          coverage: none
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+          extensions: mbstring, intl, pdo, pdo_sqlite, sqlite3
+          ini-values: date.timezone=UTC
+
+      - name: 'Install project dependencies'
+        run: |
+          composer global require --no-progress --no-scripts --no-plugins symfony/flex
+          composer update --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Update Dependencies with latest stable
+        if: matrix.dependency-stability == 'prefer-stable'
+        run: composer update --prefer-stable
+
+      - name: Update Dependencies with lowest stable
+        if: matrix.dependency-stability == 'prefer-lowest'
+        run: composer update --prefer-stable --prefer-lowest
+
+      - name: 'Run tests'
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: 'max[indirect]=10&max[total]=27'
+        run: vendor/bin/phpunit  --testdox
