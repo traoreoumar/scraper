@@ -1,1 +1,4 @@
 vendor/
+
+# PHP CS FIXER
+.php-cs-fixer.cache
